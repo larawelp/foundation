@@ -15,6 +15,8 @@ class WpRouteActionResolver
     public static $modelNamespace = '\\App\\Models\\Wp\\';
     public static $controllerNamespace = '\\App\\Http\\Controllers\\Wp\\';
 
+    public static $triedActions;
+
     /**
      * @var \Illuminate\Contracts\View\Factory
      */
@@ -321,6 +323,8 @@ class WpRouteActionResolver
                     ->implode('\\')
             );
 
+
+            $this->markTriedAction('Controller: ' . $controller . ' method index');
             if ($this->controllerExists($controller)) {
                 return $this->getAction($controller);
             }
@@ -342,7 +346,7 @@ class WpRouteActionResolver
 
         while ($hierarchy->count() > 0) {
             $view = $this->getViewPath($hierarchy->implode('.'));
-//            ray($view);
+            $this->markTriedAction('View: ' . app()->basePath('resources/views/' . $view));
             if ($this->viewExists($view)) {
                 $data = $viewData instanceof \Closure ? $viewData() : $viewData;
 
@@ -353,6 +357,16 @@ class WpRouteActionResolver
         }
 
         return null;
+    }
+
+    protected function markTriedAction(mixed $action): void
+    {
+        if(static::$triedActions === null) {
+            static::$triedActions = new LookupHierarchy();
+        }
+        static::$triedActions->totalActionsAttempted++;
+        $name = 'tried_action_'.static::$triedActions->totalActionsAttempted;
+        static::$triedActions->$name = $action;
     }
 
     protected function fullyQualifiedController(string $controllerBaseName): string
