@@ -1,0 +1,41 @@
+{
+    "name": "larawelp/foundation",
+    "description": "The LaraWelP foundation for WordPress.",
+    "keywords": [
+        "framework",
+        "laravel",
+        "wordpress",
+        "larawelp"
+    ],
+    "license": "MIT",
+    "homepage": "https://github.com/larawelp/theme",
+    "support": {
+        "issues": "https://github.com/larawelp/theme/issues",
+        "source": "https://github.com/larawelp/theme"
+    },
+    "authors": [
+        {
+            "name": "filipac",
+            "email": "filip@pacurar.net"
+        }
+    ],
+    "require": {
+        "php": "^8.0",
+        "laravel/framework": "^10.0",
+        "illuminate/contracts": "^10.0",
+        "larawelp/contracts": "^0.0",
+        "larawelp/pagination": "^0.0",
+        "larawelp/support": "^0.0"
+    },
+    "autoload": {
+        "files": [
+            "./helpers.php"
+        ],
+        "psr-4": {
+            "LaraWelP\\Foundation\\": "./"
+        }
+    },
+    "scripts": {
+        "fix-cs": ["prettier **/*.php --write"]
+    }
+}
