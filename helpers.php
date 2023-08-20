@@ -1,14 +1,17 @@
 <?php
 
+use Corcel\Model\Post;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\View\Compilers\BladeCompiler;
 use Illuminate\View\Engines\CompilerEngine;
 use Illuminate\View\View;
+use LaraWelP\Foundation\Support\Wp\Query\QueryResults;
 
 if (!function_exists('public_url')) {
     /**
      * Generate an public_url path for the application.
      *
-     * @param  string $path
+     * @param string $path
      *
      * @param bool $cacheBustingQuery
      *
@@ -77,3 +80,20 @@ if (!function_exists('setup_the_post')) {
         setup_postdata($the_post);
     }
 }
+
+Builder::macro('queriedModels', function () {
+    global $wp_query;
+    $posts = [];
+
+    if ($wp_query) {
+        $ids = array_map(function ($post) {
+            return $post->ID;
+        }, (array)$wp_query->posts);
+        $models = Post::query()->whereIn('ID', $ids)->get();
+        return array_map(function ($id) use ($models) {
+            return $models->firstWhere('ID', $id);
+        }, $ids);
+    }
+
+    return QueryResults::create($posts, $wp_query);
+});
