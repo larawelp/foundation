@@ -1,5 +1,6 @@
 <?php
 
+# global helpers
 namespace {
 
     use Corcel\Model\Post;
@@ -101,6 +102,7 @@ namespace {
     });
 }
 
+# namespaced helpers
 namespace LaraWelP {
 
     use LaraWelP\Foundation\Routing\WpRouteActionResolver;
