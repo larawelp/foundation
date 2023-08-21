@@ -2,9 +2,11 @@
 
 namespace LaraWelP\Foundation\Console;
 
+use Illuminate\Console\Application as Artisan;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use LaraWelP\Foundation\Console\Commands\ThemeUseCommand;
 
 class Kernel extends ConsoleKernel
 {
@@ -16,8 +18,8 @@ class Kernel extends ConsoleKernel
     /**
      * Create a new console kernel instance.
      *
-     * @param  \Illuminate\Contracts\Foundation\Application $app
-     * @param  \Illuminate\Contracts\Events\Dispatcher $events
+     * @param \Illuminate\Contracts\Foundation\Application $app
+     * @param \Illuminate\Contracts\Events\Dispatcher $events
      *
      * @return void
      */
@@ -45,7 +47,11 @@ class Kernel extends ConsoleKernel
         if (file_exists($wp_load)) {
             require_once $wp_load;
         }
-
+        
         parent::__construct($app, $events);
+
+        Artisan::starting(function ($artisan) {
+            $artisan->resolve(ThemeUseCommand::class);
+        });
     }
 }

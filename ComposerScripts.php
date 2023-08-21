@@ -30,4 +30,9 @@ class ComposerScripts
         $content = str_replace('function __(', 'function ___(', $content);
         file_put_contents($helpersPath, $content);
     }
+
+    public static function postAutoloadDump(Event $event)
+    {
+
+    }
 }
