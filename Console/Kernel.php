@@ -47,7 +47,7 @@ class Kernel extends ConsoleKernel
         if (file_exists($wp_load)) {
             require_once $wp_load;
         }
-        
+
         parent::__construct($app, $events);
 
         Artisan::starting(function ($artisan) {
