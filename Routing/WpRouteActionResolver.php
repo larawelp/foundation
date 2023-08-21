@@ -55,16 +55,18 @@ class WpRouteActionResolver
     {
         $queriedObject = $this->queriedObject;
 
+        $returnedAction = null;
+
         if ((is_home() || is_front_page()) && ($action = $this->getHomeAction())) {
-            return $action;
+            $returnedAction = $action;
         }
 
         if (is_page() && $queriedObject instanceof \WP_Post && ($action = $this->getPageAction())) {
-            return $action;
+            $returnedAction = $action;
         }
 
         if (is_singular() && $queriedObject instanceof \WP_Post && ($action = $this->getSingularAction())) {
-            return $action;
+            $returnedAction = $action;
         }
 
         if (
@@ -72,7 +74,7 @@ class WpRouteActionResolver
             $queriedObject instanceof \WP_Post_Type &&
             ($action = $this->getPostTypeArchiveAction())
         ) {
-            return $action;
+            $returnedAction = $action;
         }
 
         if (
@@ -80,26 +82,37 @@ class WpRouteActionResolver
             $queriedObject instanceof \WP_Term &&
             ($action = $this->getTermAction())
         ) {
-            return $action;
+            $returnedAction = $action;
         }
 
         if (is_author() && $queriedObject instanceof \WP_User && ($action = $this->getAuthorAction())) {
-            return $action;
+            $returnedAction = $action;
         }
 
         if (is_search() && ($action = $this->getSearchAction())) {
-            return $action;
+            $returnedAction = $action;
         }
 
         if (is_archive() && ($action = $this->getArchiveAction())) {
-            return $action;
+            $returnedAction = $action;
         }
 
         if (is_404() && ($action = $this->getNotFoundAction())) {
-            return $action;
+            $returnedAction = $action;
         }
 
-        return null;
+        if (is_array($returnedAction) && count($returnedAction) === 2) {
+            [$action, $data] = $returnedAction;
+            if (!class_exists($action)) {
+                return null;
+            }
+            $methods = get_class_methods($action);
+            if (!in_array($data, $methods)) {
+                return null;
+            }
+        }
+
+        return $returnedAction;
     }
 
     protected function getHomeAction(): ?array
@@ -164,7 +177,7 @@ class WpRouteActionResolver
         $viewData = $this->injectDefaultData
             ? [
                 'post' => $post,
-                'model' => (new \Corcel\Model\Post())->newFromBuilder((array) $post->wpPost()),
+                'model' => (new \Corcel\Model\Post())->newFromBuilder((array)$post->wpPost()),
             ]
             : [];
 
@@ -204,8 +217,8 @@ class WpRouteActionResolver
 
         $viewData = $this->injectDefaultData
             ? [
-                    'term' => $currentTerm,
-                ] + $this->getDataForArchivePage()
+                'term' => $currentTerm,
+            ] + $this->getDataForArchivePage()
             : [];
 
         if ($action = $this->getActionByHierarchy($termHierarchy, $viewData, 'archive')) {
@@ -222,8 +235,8 @@ class WpRouteActionResolver
         $hierarchy = ['author', $author->nickname()];
         $viewData = $this->injectDefaultData
             ? [
-                    'author' => $author,
-                ] + $this->getDataForArchivePage()
+                'author' => $author,
+            ] + $this->getDataForArchivePage()
             : [];
 
         if ($action = $this->getActionByHierarchy($hierarchy, $viewData, 'archive')) {
@@ -237,8 +250,8 @@ class WpRouteActionResolver
     {
         $viewData = $this->injectDefaultData
             ? [
-                    'keyword' => get_search_query(),
-                ] + $this->getDataForArchivePage()
+                'keyword' => get_search_query(),
+            ] + $this->getDataForArchivePage()
             : [];
 
         if ($action = $this->getActionByHierarchy(['search'], $viewData, 'archive')) {
@@ -290,11 +303,15 @@ class WpRouteActionResolver
         static::$viewData = $viewData instanceof \Closure ? $viewData() : $viewData;
 
         if ($this->resolveController && ($action = $this->getControllerActionByHierarchy($hierarchy))) {
-            return $action;
+            if($action = $this->checkAction($action)) {
+                return $action;
+            }
         }
 
         if ($action = $this->getViewActionByHierarchy($hierarchy, $viewData)) {
-            return $action;
+            if($action = $this->checkAction($action)) {
+                return $action;
+            }
         }
 
         foreach ($fallbackGenericTypes as $fallbackGenericType) {
@@ -304,6 +321,20 @@ class WpRouteActionResolver
         }
 
         return null;
+    }
+
+    protected function checkAction($action) {
+        if (is_array($action) && count($action) === 2) {
+            [$action, $data] = $action;
+            if (!class_exists($action)) {
+                return null;
+            }
+            $methods = get_class_methods($action);
+            if (!in_array($data, $methods)) {
+                return null;
+            }
+        }
+                        return $action;
     }
 
     /**
@@ -326,6 +357,7 @@ class WpRouteActionResolver
 
             $this->markTriedAction('Controller: ' . $controller . ' method index');
             if ($this->controllerExists($controller)) {
+                $methods = get_class_methods($controller);
                 return $this->getAction($controller);
             }
 
@@ -361,11 +393,11 @@ class WpRouteActionResolver
 
     protected function markTriedAction(mixed $action): void
     {
-        if(static::$triedActions === null) {
+        if (static::$triedActions === null) {
             static::$triedActions = new LookupHierarchy();
         }
         static::$triedActions->totalActionsAttempted++;
-        $name = 'tried_action_'.static::$triedActions->totalActionsAttempted;
+        $name = 'tried_action_' . static::$triedActions->totalActionsAttempted;
         static::$triedActions->$name = $action;
     }
 
@@ -451,7 +483,7 @@ class WpRouteActionResolver
 
         return [
             'post' => $post,
-            'model' => (new \Corcel\Model\Post())->newFromBuilder((array) $post->wpPost()),
+            'model' => (new \Corcel\Model\Post())->newFromBuilder((array)$post->wpPost()),
         ];
     }
 

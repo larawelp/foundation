@@ -19,7 +19,6 @@ trait ViewResolver
         $wpRouteActionResolver->resolveController = false;
         $wpRouteActionResolver->injectDefaultData = $injectDefaultData;
         $action = $wpRouteActionResolver->resolve();
-        ray($action, $defaultView);
 
         if ($action === null) {
             return $this->makeView($defaultView, $data);
