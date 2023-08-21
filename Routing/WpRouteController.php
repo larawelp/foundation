@@ -36,7 +36,7 @@ class WpRouteController extends Controller
 
         }
 
-        if(class_exists(FolioManager::class)) {
+        if(!class_exists(FolioManager::class)) {
             return $resp404 ?? abort(404);
         }
 

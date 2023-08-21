@@ -51,6 +51,7 @@ class Kernel extends ConsoleKernel
         parent::__construct($app, $events);
 
         Artisan::starting(function ($artisan) {
+            \Event::dispatch('register.folio');
             $artisan->resolve(ThemeUseCommand::class);
         });
     }
