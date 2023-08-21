@@ -7,6 +7,7 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use LaraWelP\Foundation\Console\Commands\ThemeUseCommand;
+use LaraWelP\Foundation\Providers\FoundationServiceProvider;
 
 class Kernel extends ConsoleKernel
 {
@@ -49,6 +50,8 @@ class Kernel extends ConsoleKernel
         }
 
         parent::__construct($app, $events);
+
+        $this->app->register(FoundationServiceProvider::class);
 
         Artisan::starting(function ($artisan) {
             \Event::dispatch('register.folio');

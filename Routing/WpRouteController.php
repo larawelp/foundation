@@ -36,8 +36,14 @@ class WpRouteController extends Controller
 
         }
 
-        if(!class_exists(FolioManager::class)) {
-            return $resp404 ?? abort(404);
+        if (!class_exists(FolioManager::class)) {
+            if (isset(\LaraWelP\Foundation\Routing\WpRouteActionResolver::$triedActions)) {
+                \LaraWelP\Foundation\Routing\WpRouteActionResolver::$triedActions->totalActionsAttempted++;
+                $name = 'tried_action_' . \LaraWelP\Foundation\Routing\WpRouteActionResolver::$triedActions->totalActionsAttempted;
+                \LaraWelP\Foundation\Routing\WpRouteActionResolver::$triedActions->{$name} = 'Tried to use Laravel Folio but it is not installed.';
+            }
+            $response = $this->get404Response($request);
+            return $response;
         }
 
         return $this->handleLaravelFolio($request, $resp404);
@@ -65,14 +71,26 @@ class WpRouteController extends Controller
                 return $response;
             }
         } catch (NotFoundHttpException $e) {
-            if ($resp404) {
-                return $resp404;
+            if (isset(\LaraWelP\Foundation\Routing\WpRouteActionResolver::$triedActions)) {
+                \LaraWelP\Foundation\Routing\WpRouteActionResolver::$triedActions->totalActionsAttempted++;
+                $name = 'tried_action_' . \LaraWelP\Foundation\Routing\WpRouteActionResolver::$triedActions->totalActionsAttempted;
+                \LaraWelP\Foundation\Routing\WpRouteActionResolver::$triedActions->{$name} = 'Tried to use Laravel Folio but no route matched. Doc: https://github.com/laravel/folio';
             }
-            $route = app('wpRouter')->getRouter()->getRoutes()->getByAction('App\Http\HandleNotFound@handle404');
-            $route->bind($request);
-            $response = $route->run();
-            $response->setStatusCode(404);
+            $response = $this->get404Response($request);
             return $response;
         }
+    }
+
+    /**
+     * @param Request $request
+     * @return mixed
+     */
+    private function get404Response(Request $request)
+    {
+        $route = app('wpRouter')->getRouter()->getRoutes()->getByAction('App\Http\HandleNotFound@handle404');
+        $route->bind($request);
+        $response = $route->run();
+        $response->setStatusCode(404);
+        return $response;
     }
 }

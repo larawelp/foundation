@@ -3,15 +3,24 @@
 namespace LaraWelP\Foundation\Http;
 
 use Exception;
-use Throwable;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Pipeline\Pipeline;
+use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 use Illuminate\Foundation\Http\Events\RequestHandled;
+use LaraWelP\Foundation\Providers\FoundationServiceProvider;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
 
 class Kernel extends HttpKernel
 {
+    public function __construct(Application $app, Router $router)
+    {
+        parent::__construct($app, $router);
+
+        $this->app->register(FoundationServiceProvider::class);
+    }
+
     /**
      * Handle an incoming HTTP request.
      *
