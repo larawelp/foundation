@@ -27,7 +27,8 @@
         "illuminate/contracts": "^10.0",
         "larawelp/contracts": "^0.0",
         "larawelp/pagination": "^0.0",
-        "larawelp/support": "^0.0"
+        "larawelp/support": "^0.0",
+        "jgrossi/corcel": "7.0.x-dev"
     },
     "autoload": {
         "files": [
