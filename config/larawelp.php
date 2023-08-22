@@ -8,5 +8,5 @@ return [
      * for Folio for more details on how this works
      * @see https://github.com/laravel/folio
      */
-    'enable_folio_integration' => false,
+    'enable_folio_integration' => true,
 ];
