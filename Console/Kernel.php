@@ -51,7 +51,12 @@ class Kernel extends ConsoleKernel
 
         parent::__construct($app, $events);
 
-        $this->app->register(FoundationServiceProvider::class);
+        app('events')
+        ->listen(
+            'bootstrapping: Illuminate\Foundation\Bootstrap\RegisterProviders',
+            function (Application $app) {
+                $app->register(FoundationServiceProvider::class);
+            });
 
         Artisan::starting(function ($artisan) {
             \Event::dispatch('register.folio');

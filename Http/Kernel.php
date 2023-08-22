@@ -18,7 +18,12 @@ class Kernel extends HttpKernel
     {
         parent::__construct($app, $router);
 
-        $this->app->register(FoundationServiceProvider::class);
+        app('events')
+        ->listen(
+            'bootstrapping: Illuminate\Foundation\Bootstrap\RegisterProviders',
+            function (Application $app) {
+                $app->register(FoundationServiceProvider::class);
+            });
     }
 
     /**
