@@ -36,11 +36,12 @@ class WpRouteController extends Controller
 
         }
 
-        if (!class_exists(FolioManager::class)) {
+        $folioEnabled = config('larawelp.enable_folio_integration', true);
+        if (!class_exists(FolioManager::class) || !$folioEnabled) {
             if (isset(\LaraWelP\Foundation\Routing\WpRouteActionResolver::$triedActions)) {
                 \LaraWelP\Foundation\Routing\WpRouteActionResolver::$triedActions->totalActionsAttempted++;
                 $name = 'tried_action_' . \LaraWelP\Foundation\Routing\WpRouteActionResolver::$triedActions->totalActionsAttempted;
-                \LaraWelP\Foundation\Routing\WpRouteActionResolver::$triedActions->{$name} = 'Tried to use Laravel Folio but it is not installed.';
+                \LaraWelP\Foundation\Routing\WpRouteActionResolver::$triedActions->{$name} = 'Tried to use Laravel Folio but it is not installed or enabled in config.';
             }
             $response = $this->get404Response($request);
             return $response;

@@ -14,5 +14,14 @@ class FoundationServiceProvider extends \Illuminate\Support\ServiceProvider
             ],
             'larawelp-views'
         );
+
+        $this->mergeConfigFrom(
+            __DIR__ . '/../config/larawelp.php',
+            'larawelp'
+        );
+
+        $this->publishes([
+            __DIR__ . '/../config/larawelp.php' => config_path('larawelp.php'),
+        ], 'larawelp-config');
     }
 }
