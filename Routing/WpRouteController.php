@@ -4,6 +4,7 @@ namespace LaraWelP\Foundation\Routing;
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use LaraWelP\Foundation\Events\WhenFolioRegisters;
 use LaraWelP\Foundation\Support\Providers\RouteServiceProvider;
 use Laravel\Folio\FolioManager;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -62,7 +63,7 @@ class WpRouteController extends Controller
      */
     private function handleLaravelFolio(Request $request, ?\Symfony\Component\HttpFoundation\Response $resp404)
     {
-        \Event::dispatch('register.folio');
+        app('events')->dispatch(WhenFolioRegisters::EVENT_NAME);
         $manager = app(FolioManager::class);
         $folioHandler = (fn() => $this->handler())->call($manager);
         try {

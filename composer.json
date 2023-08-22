@@ -22,6 +22,8 @@
     "require": {
         "php": "^8.0",
         "laravel/framework": "^10.0",
+        "laravel/folio": "^1.0@beta",
+        "laravel/horizon": "^5.10",
         "illuminate/contracts": "^10.0",
         "larawelp/contracts": "^0.0",
         "larawelp/pagination": "^0.0",
