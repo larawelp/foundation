@@ -325,16 +325,16 @@ class WpRouteActionResolver
 
     protected function checkAction($action) {
         if (is_array($action) && count($action) === 2) {
-            [$action, $data] = $action;
-            if (!class_exists($action)) {
+            [$_action, $data] = $action;
+            if (!class_exists($_action)) {
                 return null;
             }
-            $methods = get_class_methods($action);
+            $methods = get_class_methods($_action);
             if (!in_array($data, $methods)) {
                 return null;
             }
         }
-                        return $action;
+        return $action;
     }
 
     /**
