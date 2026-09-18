@@ -42,7 +42,7 @@ class Taxonomy extends BaseModel
      * @param string $name
      * @param string|null $termClass
      */
-    public function __construct(string $name, string $termClass = null)
+    public function __construct(string $name, ?string $termClass = null)
     {
         $this->name = $name;
         $this->termClass = $termClass ?? static::$defaultTermClass;

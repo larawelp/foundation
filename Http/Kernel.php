@@ -2,7 +2,7 @@
 
 namespace LaraWelP\Foundation\Http;
 
-use Exception;
+use Throwable;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Routing\Router;
@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Facade;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 use Illuminate\Foundation\Http\Events\RequestHandled;
 use LaraWelP\Foundation\Providers\FoundationServiceProvider;
-use Symfony\Component\Debug\Exception\FatalThrowableError;
 
 class Kernel extends HttpKernel
 {
@@ -85,7 +84,7 @@ class Kernel extends HttpKernel
                         ->send($request)
                         ->through($this->app->shouldSkipMiddleware() ? [] : $this->middleware)
                         ->then($this->dispatchToRouter());
-                } catch (Exception $e) {
+                } catch (Throwable $e) {
                     $this->reportException($e);
 
                     $response = $this->renderException($request, $e);
@@ -103,7 +102,10 @@ class Kernel extends HttpKernel
     {
         $originalRouter = $this->router;
         $this->router = $this->app['wpRouter']->getRouter();
-        parent::syncMiddlewareToRouter();
-        $this->router = $originalRouter;
+        try {
+            parent::syncMiddlewareToRouter();
+        } finally {
+            $this->router = $originalRouter;
+        }
     }
 }

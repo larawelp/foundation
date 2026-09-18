@@ -11,7 +11,7 @@
 </div>
 
 @php
-    $handler = function ($var, string $label = null) {
+    $handler = function ($var, ?string $label = null) {
         $cloner = new \Symfony\Component\VarDumper\Cloner\VarCloner();
         $dumper = new \Symfony\Component\VarDumper\Dumper\HtmlDumper();
         $dumper->setTheme('light');

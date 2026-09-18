@@ -32,7 +32,7 @@ class WpRouter
      * @param \Illuminate\Container\Container|null $container
      * @return void
      */
-    public function __construct(Dispatcher $events, Container $container = null)
+    public function __construct(Dispatcher $events, ?Container $container = null)
     {
         $this->router = new Router($events, $container);
     }
@@ -229,11 +229,12 @@ class WpRouter
 
         Route::$validators = $newValidators;
 
-        $response = $this->router->dispatch($request);
-
-        Route::$validators = $originalValidators;
-
-        return $response;
+        try {
+            return $this->router->dispatch($request);
+        } finally {
+            // A missing WordPress route must not affect subsequent Laravel/Folio routes.
+            Route::$validators = $originalValidators;
+        }
     }
 
     /**

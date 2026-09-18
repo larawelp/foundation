@@ -85,6 +85,10 @@ namespace {
     }
 
     Builder::macro('queriedModels', function () {
+        if (!class_exists(Post::class)) {
+            throw new \LogicException('queriedModels requires jgrossi/corcel. Install a Corcel release compatible with your Laravel version.');
+        }
+
         global $wp_query;
         $posts = [];
 

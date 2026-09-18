@@ -426,7 +426,7 @@ class WpRouteActionResolver
         return [ViewController::class, 'index', ['view' => $view] + $data];
     }
 
-    protected function getModelClassForPostType(string $postType = null): ?string
+    protected function getModelClassForPostType(?string $postType = null): ?string
     {
         $postType = $postType ?? $this->getPostType();
 
@@ -436,7 +436,7 @@ class WpRouteActionResolver
         return class_exists($modelClass) ? $modelClass : null;
     }
 
-    protected function getModelClassForTerm(string $taxonomy = null): ?string
+    protected function getModelClassForTerm(?string $taxonomy = null): ?string
     {
         $taxonomy = $taxonomy ?? $this->queriedObject->taxonomy;
         $classBaseName = ucfirst(Str::camel($taxonomy));
