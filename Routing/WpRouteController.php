@@ -44,7 +44,7 @@ class WpRouteController extends Controller
                 $name = 'tried_action_' . \LaraWelP\Foundation\Routing\WpRouteActionResolver::$triedActions->totalActionsAttempted;
                 \LaraWelP\Foundation\Routing\WpRouteActionResolver::$triedActions->{$name} = 'Tried to use Laravel Folio but it is not installed or enabled in config.';
             }
-            $response = $this->get404Response($request);
+            $response = $resp404 ?? $this->get404Response($request);
             return $response;
         }
 
@@ -59,26 +59,23 @@ class WpRouteController extends Controller
     /**
      * @param Request $request
      * @param \Symfony\Component\HttpFoundation\Response|null $resp404
-     * @return \Illuminate\Http\Response|\Symfony\Component\HttpFoundation\Response|void
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     private function handleLaravelFolio(Request $request, ?\Symfony\Component\HttpFoundation\Response $resp404)
     {
         app('events')->dispatch(WhenFolioRegisters::EVENT_NAME);
         $manager = app(FolioManager::class);
-        $folioHandler = (fn() => $this->handler())->call($manager);
         try {
-            $response = $folioHandler($request);
-
-            if ($response instanceof \Illuminate\Http\Response) {
-                return $response;
-            }
+            // Folio's public entry point also runs page middleware and render callbacks.
+            // Normalize all supported results, including redirects, JSON and streamed responses.
+            return app('router')->toResponse($request, $manager->handle($request));
         } catch (NotFoundHttpException $e) {
             if (isset(\LaraWelP\Foundation\Routing\WpRouteActionResolver::$triedActions)) {
                 \LaraWelP\Foundation\Routing\WpRouteActionResolver::$triedActions->totalActionsAttempted++;
                 $name = 'tried_action_' . \LaraWelP\Foundation\Routing\WpRouteActionResolver::$triedActions->totalActionsAttempted;
                 \LaraWelP\Foundation\Routing\WpRouteActionResolver::$triedActions->{$name} = 'Tried to use Laravel Folio but no route matched. Doc: https://github.com/laravel/folio';
             }
-            $response = $this->get404Response($request);
+            $response = $resp404 ?? $this->get404Response($request);
             return $response;
         }
     }
